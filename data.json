@@ -1,0 +1,406 @@
+[
+{
+  "model": "auth.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$870000$H9u2WCvLbilGZjhbI6x7Xu$JbQTfuOAFLgMQ2ZEIwC90h3GK3jFgvSTY6poj9ToT6E=",
+    "last_login": "2025-03-04T23:02:40.957Z",
+    "is_superuser": true,
+    "username": "youssef",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-02-26T11:52:07.489Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$870000$EMB2L6lmNBMizDNAva21Kl$YJr6a1iT7kxgBh0KxCz53Coa/LyC1lfuzti3MWmG6Zo=",
+    "last_login": "2025-08-09T13:48:41.599Z",
+    "is_superuser": true,
+    "username": "joe",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-05-30T17:11:50.946Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "sites.site",
+  "pk": 1,
+  "fields": {
+    "domain": "127.0.0.1:8000",
+    "name": "127.0.0.1:8000"
+  }
+},
+{
+  "model": "taggit.tag",
+  "pk": 1,
+  "fields": {
+    "name": "music",
+    "slug": "music"
+  }
+},
+{
+  "model": "taggit.tag",
+  "pk": 2,
+  "fields": {
+    "name": "jazz",
+    "slug": "jazz"
+  }
+},
+{
+  "model": "taggit.tag",
+  "pk": 3,
+  "fields": {
+    "name": "django",
+    "slug": "django"
+  }
+},
+{
+  "model": "taggit.tag",
+  "pk": 4,
+  "fields": {
+    "name": "rota",
+    "slug": "rota"
+  }
+},
+{
+  "model": "taggit.tag",
+  "pk": 5,
+  "fields": {
+    "name": "markdown",
+    "slug": "markdown"
+  }
+},
+{
+  "model": "taggit.taggeditem",
+  "pk": 1,
+  "fields": {
+    "tag": 1,
+    "content_type": 7,
+    "object_id": 1
+  }
+},
+{
+  "model": "taggit.taggeditem",
+  "pk": 2,
+  "fields": {
+    "tag": 2,
+    "content_type": 7,
+    "object_id": 1
+  }
+},
+{
+  "model": "taggit.taggeditem",
+  "pk": 4,
+  "fields": {
+    "tag": 2,
+    "content_type": 7,
+    "object_id": 2
+  }
+},
+{
+  "model": "taggit.taggeditem",
+  "pk": 5,
+  "fields": {
+    "tag": 2,
+    "content_type": 7,
+    "object_id": 3
+  }
+},
+{
+  "model": "taggit.taggeditem",
+  "pk": 6,
+  "fields": {
+    "tag": 2,
+    "content_type": 7,
+    "object_id": 4
+  }
+},
+{
+  "model": "taggit.taggeditem",
+  "pk": 7,
+  "fields": {
+    "tag": 2,
+    "content_type": 7,
+    "object_id": 5
+  }
+},
+{
+  "model": "taggit.taggeditem",
+  "pk": 8,
+  "fields": {
+    "tag": 2,
+    "content_type": 7,
+    "object_id": 6
+  }
+},
+{
+  "model": "taggit.taggeditem",
+  "pk": 9,
+  "fields": {
+    "tag": 2,
+    "content_type": 7,
+    "object_id": 7
+  }
+},
+{
+  "model": "taggit.taggeditem",
+  "pk": 10,
+  "fields": {
+    "tag": 2,
+    "content_type": 7,
+    "object_id": 8
+  }
+},
+{
+  "model": "taggit.taggeditem",
+  "pk": 11,
+  "fields": {
+    "tag": 5,
+    "content_type": 7,
+    "object_id": 9
+  }
+},
+{
+  "model": "blog.post",
+  "pk": 1,
+  "fields": {
+    "title": "youssef",
+    "slug": "youussef",
+    "body": "try way",
+    "publish": "2025-02-26T11:56:20Z",
+    "created": "2025-02-26T11:56:47.232Z",
+    "updated": "2025-02-26T14:25:10.683Z",
+    "status": "PB",
+    "author": 1
+  }
+},
+{
+  "model": "blog.post",
+  "pk": 2,
+  "fields": {
+    "title": "new title",
+    "slug": "another-post",
+    "body": "post body .",
+    "publish": "2025-02-26T12:57:43Z",
+    "created": "2025-02-26T12:57:53.916Z",
+    "updated": "2025-06-01T19:16:26.365Z",
+    "status": "PB",
+    "author": 1
+  }
+},
+{
+  "model": "blog.post",
+  "pk": 3,
+  "fields": {
+    "title": "a7aasgu",
+    "slug": "a7aasgu",
+    "body": "hijknjok",
+    "publish": "2025-02-28T17:49:47Z",
+    "created": "2025-02-28T17:50:13.998Z",
+    "updated": "2025-06-01T23:32:54.491Z",
+    "status": "PB",
+    "author": 1
+  }
+},
+{
+  "model": "blog.post",
+  "pk": 4,
+  "fields": {
+    "title": "1671wy",
+    "slug": "1671wy",
+    "body": "8yugh78ujui",
+    "publish": "2025-02-28T17:50:18Z",
+    "created": "2025-02-28T17:50:25.665Z",
+    "updated": "2025-06-01T23:32:58.931Z",
+    "status": "PB",
+    "author": 1
+  }
+},
+{
+  "model": "blog.post",
+  "pk": 5,
+  "fields": {
+    "title": "moa",
+    "slug": "moa",
+    "body": "please retry don`t do it",
+    "publish": "2025-06-01T23:33:00Z",
+    "created": "2025-06-01T23:33:23.277Z",
+    "updated": "2025-06-02T00:13:06.630Z",
+    "status": "PB",
+    "author": 1
+  }
+},
+{
+  "model": "blog.post",
+  "pk": 6,
+  "fields": {
+    "title": "1yuwq",
+    "slug": "1yuwq",
+    "body": "jinsdjisn",
+    "publish": "2025-06-01T23:33:31Z",
+    "created": "2025-06-01T23:33:41.806Z",
+    "updated": "2025-06-01T23:33:41.806Z",
+    "status": "PB",
+    "author": 1
+  }
+},
+{
+  "model": "blog.post",
+  "pk": 7,
+  "fields": {
+    "title": "ratata",
+    "slug": "ratata",
+    "body": "jindedji",
+    "publish": "2025-06-01T23:33:55Z",
+    "created": "2025-06-01T23:34:07.247Z",
+    "updated": "2025-06-01T23:34:07.247Z",
+    "status": "PB",
+    "author": 1
+  }
+},
+{
+  "model": "blog.post",
+  "pk": 8,
+  "fields": {
+    "title": "no deone",
+    "slug": "no-deone",
+    "body": "moara",
+    "publish": "2025-08-09T13:49:02Z",
+    "created": "2025-08-09T13:49:29.063Z",
+    "updated": "2025-08-09T13:49:29.063Z",
+    "status": "PB",
+    "author": 1
+  }
+},
+{
+  "model": "blog.post",
+  "pk": 9,
+  "fields": {
+    "title": "markdown post",
+    "slug": "markdown-post",
+    "body": "This is a post formatted with markdown\r\n--------------------------------------\r\n*This is emphasized* and **this is more emphasized**.\r\nHere is a list:\r\n* One\r\n* Two\r\n* Three\r\nAnd a [link to the Django website](https://www.djangoproject.com/).",
+    "publish": "2025-08-09T15:22:40Z",
+    "created": "2025-08-09T15:23:38.498Z",
+    "updated": "2025-08-09T15:23:38.498Z",
+    "status": "PB",
+    "author": 1
+  }
+},
+{
+  "model": "blog.comment",
+  "pk": 2,
+  "fields": {
+    "post": 1,
+    "name": "joe",
+    "email": "moamenosman07@gmail.com",
+    "body": "xcjjmxizm",
+    "created": "2025-03-12T18:42:37.317Z",
+    "updated": "2025-06-01T23:47:35.726Z",
+    "active": true
+  }
+},
+{
+  "model": "blog.comment",
+  "pk": 3,
+  "fields": {
+    "post": 5,
+    "name": "youssef",
+    "email": "joamahmoud37@gmail.com",
+    "body": "i play foot",
+    "created": "2025-06-02T00:15:57.888Z",
+    "updated": "2025-06-02T00:15:57.888Z",
+    "active": true
+  }
+},
+{
+  "model": "blog.comment",
+  "pk": 4,
+  "fields": {
+    "post": 5,
+    "name": "youssef",
+    "email": "joamahmoud37@gmail.com",
+    "body": "i play foot",
+    "created": "2025-06-02T00:16:20.610Z",
+    "updated": "2025-06-02T00:16:20.610Z",
+    "active": true
+  }
+},
+{
+  "model": "blog.comment",
+  "pk": 5,
+  "fields": {
+    "post": 5,
+    "name": "youssef",
+    "email": "joamahmoud37@gmail.com",
+    "body": "i play foot",
+    "created": "2025-06-02T00:18:20.672Z",
+    "updated": "2025-06-02T00:18:20.672Z",
+    "active": true
+  }
+},
+{
+  "model": "blog.comment",
+  "pk": 6,
+  "fields": {
+    "post": 5,
+    "name": "youssef",
+    "email": "joamahmoud37@gmail.com",
+    "body": "i play foot",
+    "created": "2025-06-02T00:20:46.353Z",
+    "updated": "2025-06-02T00:20:46.353Z",
+    "active": true
+  }
+},
+{
+  "model": "blog.comment",
+  "pk": 7,
+  "fields": {
+    "post": 5,
+    "name": "nom",
+    "email": "moamenosman07@gmail.com",
+    "body": "done",
+    "created": "2025-06-02T00:21:09.290Z",
+    "updated": "2025-06-02T00:21:09.290Z",
+    "active": true
+  }
+},
+{
+  "model": "blog.comment",
+  "pk": 8,
+  "fields": {
+    "post": 5,
+    "name": "rint",
+    "email": "joamahmoud37@gmail.com",
+    "body": "botola",
+    "created": "2025-06-21T18:13:07.503Z",
+    "updated": "2025-06-21T18:13:07.503Z",
+    "active": true
+  }
+},
+{
+  "model": "blog.comment",
+  "pk": 9,
+  "fields": {
+    "post": 1,
+    "name": "..",
+    "email": "Unknown@gmail.com",
+    "body": "nodoeoee",
+    "created": "2025-08-09T14:03:56.974Z",
+    "updated": "2025-08-09T14:03:56.974Z",
+    "active": true
+  }
+}
+]
