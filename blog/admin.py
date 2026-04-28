@@ -32,10 +32,16 @@ class PostAdmin(admin.ModelAdmin):
 
 
 
-
+from django.utils.html import format_html
+from django.urls import reverse
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ['name', 'email', 'post', 'created', 'active']
+    def post_link(self , obj):
+        url = reverse("admin:blog_post_change" , args=[obj.post.id])
+
+        return format_html("<a href='{}'>{}</a>" , url , obj.post.title)
+    
+    list_display = ['name', 'email', 'post_link', 'created', 'active']
     list_filter = ['active', 'created', 'updated']
     search_fields = ['name', 'email', 'body']

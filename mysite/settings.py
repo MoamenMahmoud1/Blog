@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django.contrib.sitemaps',
-    "django_etensions",
+    "django_extensions",
     'django.contrib.postgres',
     'taggit',
     'blog.apps.BlogConfig',

@@ -7,12 +7,12 @@ from taggit.managers import TaggableManager
 
 
 
-# ========{Post}========( Colmun / Row )
+# ========{Post}========
 #=================================================================================================================================
 
 class PublishedManager(models.Manager):
     def get_queryset(self):
-        """إرجاع فقط المنشورات التي حالتها 'PUBLISHED'"""
+        
         return super().get_queryset().filter(status=Post.Status.PUBLISHED)
 
 #===============================================
@@ -31,8 +31,8 @@ class Post(models.Model):
     updated = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=2, choices=Status, default=Status.DRAFT)
     author = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name='blog_posts') # many to one
-    objects = models.Manager()  # المدير الافتراضي لاسترجاع جميع المنشورات
-    published = PublishedManager()  # المدير المخصص لاسترجاع المنشورات المنشورة فقط
+    objects = models.Manager()  
+    published = PublishedManager()  
 
 #===============================================
 
