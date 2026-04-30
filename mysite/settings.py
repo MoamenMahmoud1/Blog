@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
     'taggit',
     'blog.apps.BlogConfig',
+    'easy_thumbnails',
 ]
 
 MIDDLEWARE = [
@@ -85,6 +86,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                
             ],
         },
     },
@@ -153,3 +155,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #======================================
 
 SITE_ID = 1
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR , 'media')
+
+
+
+
+
+THUMBNAIL_ALIASES = {
+    '': {
+        'avatar': {'size': (150, 150), 'crop': True},
+        'medium': {'size': (400, 400), 'crop': False},
+    },
+}

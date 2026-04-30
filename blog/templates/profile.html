@@ -1,0 +1,62 @@
+{% extends "blog/base.html" %}
+{% load thumbnail %}
+
+{% block content %}
+
+<h2>{{ profile.user.username }}</h2>
+
+<!-- 🔥 Lightbox assets (يفضل تنقلهم لـ base.html لاحقًا) -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
+
+<!-- 🔥 Profile Image -->
+{% if profile.img %}
+
+    <a href="{{ profile.img.url }}" data-lightbox="profile">
+
+        <img src="{% thumbnail profile.img 150x150 crop %}"
+             style="cursor:pointer; border-radius:50%;">
+
+    </a>
+
+{% endif %}
+
+<hr>
+
+<!-- 🔥 Form -->
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    
+    
+    <div>
+        <label>Image</label>
+        {{ form.img }}
+        {{ form.img.errors }}
+    </div>
+
+    <br>
+
+    <div>
+        <label>Bio</label>
+        {{ form.bio }}
+        {{ form.bio.errors }}
+    </div>
+
+    <br>
+
+    {% if request.user == profile.user %}
+        <button type="submit">Save</button>
+    {% endif %}
+</form>
+
+<hr>
+
+<!-- 🔥 Edit Button -->
+{% if request.user == profile.user %}
+    <a href="{% url 'blog:edit-profile' profile.id %}">
+        <button type="button">Edit Profile</button>
+    </a>
+{% endif %}
+
+{% endblock content %}

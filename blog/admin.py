@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Post , Comment
+from .models import Post , Comment , Profile
 
 
 @admin.register(Post)  # تسجيل نموذج Post في لوحة تحكم Django باستخدام ديكور @admin.register
@@ -45,3 +45,9 @@ class CommentAdmin(admin.ModelAdmin):
     list_display = ['name', 'email', 'post_link', 'created', 'active']
     list_filter = ['active', 'created', 'updated']
     search_fields = ['name', 'email', 'body']
+
+
+
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ["user" , "img"]

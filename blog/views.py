@@ -1,9 +1,9 @@
 from django.views.generic import ListView
 from django.shortcuts import render , get_object_or_404 , redirect
-from .models import Post
+from .models import Post , Profile
 from django.http import Http404 
 from django.core.paginator import Paginator , EmptyPage , PageNotAnInteger
-from .forms import EmailPostForm 
+from .forms import EmailPostForm , ProfileForm
 from django.core.mail import send_mail
 from taggit.models import Tag
 from django.views.generic import ListView
@@ -12,7 +12,8 @@ from django.views.generic import ListView
 from django.db.models import Count
 # Create your views here.
 
-
+from django.contrib.auth import get_user_model
+User = get_user_model()
 class PostListView(ListView):
      model = Post
      context_object_name = "posts"  
@@ -20,23 +21,27 @@ class PostListView(ListView):
      paginate_by = 3
 
      def get_queryset(self):
-         queryset = Post.published.all()
-         self.tag = None
+         
+          queryset = Post.published.all()
+          self.tag = None
 
-         tag_slug = self.kwargs.get('tag_slug')
+          tag_slug = self.kwargs.get('tag_slug')
 
-         if tag_slug:
+          if tag_slug:
               self.tag = get_object_or_404(Tag , slug = tag_slug)
               queryset = queryset.filter(tags__in=[self.tag])
-              return queryset
+          return queryset
+         
      
      def get_context_data(self, **kwargs):
           context = super().get_context_data(**kwargs)
           context['tag'] = self.tag
+          context['admin'] = User.objects.filter(is_superuser=True).first()
           return context
-
      
 
+     
+'''
 def post_list(request , tag_slug=None):
      post_list = Post.published.all()
      
@@ -67,16 +72,8 @@ def post_list(request , tag_slug=None):
      'post/list.html',
      {'posts': posts , 'tag':tag}
 )
-"""
+'''
 
-class PostListView(ListView):
-     queryset = Post.published.all()
-     context_object_name = 'posts'
-     paginate_by = 3
-     template_name = 'post/list.html'
-     
-          
-"""
 
 def post_detail(request,year,month,day,post):
      post = get_object_or_404(Post,status=Post.Status.PUBLISHED,slug=post,publish__year=year,publish__month=month,publish__day=day)
@@ -175,3 +172,36 @@ def post_search(request):
      'results': results
      }
      )
+
+
+from django.contrib.auth.mixins import UserPassesTestMixin , LoginRequiredMixin 
+from django.http import  HttpResponseForbidden
+from django.views.generic import UpdateView 
+from django.urls import reverse , reverse_lazy
+from django.contrib.auth.views import LoginView
+class ProfileUpdateView(UserPassesTestMixin , UpdateView):
+     model = Profile
+     form_class = ProfileForm
+     template_name = 'profile.html'
+
+
+     def test_func(self):
+          obj = self.get_object()
+          return self.request.user == obj.user
+     
+     def get_context_data(self, **kwargs):
+          context = super().get_context_data(**kwargs)
+          context['profile'] = self.get_object()
+          return context
+     def get_success_url(self):
+        return reverse('blog:edit-profile', kwargs={'pk': self.object.pk})
+
+
+
+class LoginView(LoginView):
+     template_name = 'registration/login.html'
+     reddirect_authenticated_user = True
+
+
+     def get_success_url(self):
+          return reverse_lazy('blog:post_list')

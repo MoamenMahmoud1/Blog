@@ -1,5 +1,5 @@
 from django import forms
-from .models import Comment
+from .models import Comment , Profile
 
 #====================================================================
 class EmailPostForm(forms.Form):
@@ -19,4 +19,21 @@ class CommentForm(forms.ModelForm):
         
 class SearchForm(forms.Form):
     query = forms.CharField()
-        
+
+
+
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+
+        model = Profile
+        fields = ["img"]
+    img = forms.ImageField(
+        widget=forms.FileInput
+    )
+        #widgets = {
+        #    'img': forms.ClearableFileInput(attrs={
+        #        'class':'form-control'
+        #    })
+        #}
+    

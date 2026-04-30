@@ -89,3 +89,11 @@ class Comment(models.Model):
         ]
     def __str__(self):
         return f'Comment by {self.name} on {self.post}'
+
+
+
+from django.contrib.auth.models import User
+
+class Profile(models.Model):
+    user = models.OneToOneField(User , on_delete=models.CASCADE)
+    img = models.ImageField(upload_to="profiles/%y/%m/%d/" , blank=True , null=True)

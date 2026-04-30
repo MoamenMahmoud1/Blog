@@ -2,8 +2,10 @@
 {% load blog_tags %}
 {% block title %}My Blog{% endblock %}
 {% block content %}
+
 <div class="container mt-4">
     <h1 class="mb-4 text-primary">My Blog</h1>
+    {% include "the_developer.html" %}
 
     {% if tag %}
     <div class="alert alert-info">
