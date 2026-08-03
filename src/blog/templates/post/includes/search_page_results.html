@@ -1,0 +1,25 @@
+<div class="infinite-items search-page-items">
+    {% for post in results %}
+        <article class="card search-page-result feed-item mb-3">
+            <div class="card-body">
+                <h3 class="h5 mb-2">
+                    <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                </h3>
+                <p class="text-body-secondary mb-2">{{ post.body|striptags|truncatechars:220 }}</p>
+                <small class="text-body-secondary">{{ post.author.get_username }} · {{ post.publish|date:"M j, Y" }}</small>
+            </div>
+        </article>
+    {% empty %}
+        <div class="alert alert-info search-page-empty">No matching posts were found.</div>
+    {% endfor %}
+</div>
+{% if next_page %}
+    <div class="infinite-controls">
+        <a class="btn btn-outline-primary infinite-load-more"
+           href="{% url 'blog:post_search' %}?query={{ query|urlencode }}&amp;page={{ next_page }}"
+           data-next-url="{% url 'blog:post_search' %}?query={{ query|urlencode }}&amp;page={{ next_page }}">
+            <span class="infinite-load-more__label">Load more results</span>
+            <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
+        </a>
+    </div>
+{% endif %}

@@ -1,0 +1,30 @@
+{% if not query_is_valid %}
+    <div class="search-empty-state">
+        <span aria-hidden="true">⌨</span>
+        <p class="mb-0">Type at least two characters to search.</p>
+    </div>
+{% elif results %}
+    <ul class="search-result-list" role="list">
+        {% for post in results %}
+            <li>
+                <a class="search-result" href="{{ post.get_absolute_url }}">
+                    <span class="search-result__title">{{ post.title }}</span>
+                    <span class="search-result__excerpt">{{ post.body|striptags|truncatechars:120 }}</span>
+                    <span class="search-result__meta">{{ post.author.get_username }} · {{ post.publish|date:"M j, Y" }}</span>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+    {% if has_more %}
+        <div class="search-load-more-wrapper">
+            <a class="btn btn-outline-primary btn-sm"
+               href="{% url 'blog:post_search' %}?query={{ query|urlencode }}">View all results</a>
+        </div>
+    {% endif %}
+{% else %}
+    <div class="search-empty-state">
+        <span aria-hidden="true">∅</span>
+        <p class="mb-1">No posts found for “{{ query }}”.</p>
+        <small>Try fewer or more general words.</small>
+    </div>
+{% endif %}

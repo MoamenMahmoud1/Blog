@@ -1,0 +1,46 @@
+<div class="infinite-items post-feed-items">
+    {% for post in posts %}
+        <article class="post-card feed-item">
+            <div class="post-card__body">
+                <div class="post-card__meta">
+                    <time datetime="{{ post.publish|date:'c' }}">{{ post.publish|date:"M j, Y" }}</time>
+                    <span aria-hidden="true">·</span>
+                    <span>{{ post.author.get_username }}</span>
+                </div>
+                <h2 class="post-card__title">
+                    <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                </h2>
+                <p class="post-card__excerpt">{{ post.body|striptags|truncatechars:240 }}</p>
+                <div class="post-card__footer">
+                    <div class="post-tags" aria-label="Post tags">
+                        {% for tag_item in post.tags.all %}
+                            <a href="{% url 'blog:post_list_by_tag' tag_item.slug %}"
+                               class="tag-chip">#{{ tag_item.name }}</a>
+                        {% empty %}
+                            <span class="text-body-secondary small">Uncategorised</span>
+                        {% endfor %}
+                    </div>
+                    <a class="read-link" href="{{ post.get_absolute_url }}">
+                        Read article <span aria-hidden="true">→</span>
+                    </a>
+                </div>
+            </div>
+        </article>
+    {% empty %}
+        <div class="empty-state feed-item">
+            <span class="empty-state__icon" aria-hidden="true">✦</span>
+            <h2 class="h4">No posts here yet</h2>
+            <p class="text-body-secondary mb-0">New writing will appear here when it is published.</p>
+        </div>
+    {% endfor %}
+</div>
+{% if next_cursor %}
+    <div class="infinite-controls">
+        <a class="btn btn-outline-primary infinite-load-more"
+           href="{% if tag %}{% url 'blog:post_list_by_tag' tag.slug %}{% else %}{% url 'blog:post_list' %}{% endif %}?cursor={{ next_cursor|urlencode }}"
+           data-next-url="{% if tag %}{% url 'blog:post_list_by_tag' tag.slug %}{% else %}{% url 'blog:post_list' %}{% endif %}?cursor={{ next_cursor|urlencode }}">
+            <span class="infinite-load-more__label">Load more posts</span>
+            <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
+        </a>
+    </div>
+{% endif %}

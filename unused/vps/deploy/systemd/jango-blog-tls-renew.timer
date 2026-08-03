@@ -1,0 +1,12 @@
+[Unit]
+Description=Check Django Blog TLS certificate renewal twice daily
+
+[Timer]
+OnCalendar=*-*-* 00,12:00:00
+Persistent=true
+RandomizedDelaySec=30m
+AccuracySec=1m
+Unit=django-blog-tls-renew.service
+
+[Install]
+WantedBy=timers.target

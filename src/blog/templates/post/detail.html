@@ -1,0 +1,45 @@
+{% extends "blog/base.html" %}
+{% load blog_tags %}
+{% load static %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block extra_css %}
+    <link href="{% static 'blog/css/pages/post-detail.css' %}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h1>{{ post.title }}</h1>
+            <p class="text-muted">Published {{ post.publish|date:"F j, Y" }} by {{ post.author }}</p>
+            <div class="article-body mb-3">{{ post.body|markdown }}</div>
+            <div class="article-actions">
+                <a class="btn btn-success btn-sm"
+                   href="{% url "blog:post_share" post.id %}">Share this post</a>
+                {% if request.user == post.author and perms.blog.change_post %}
+                    <a class="btn btn-outline-primary btn-sm"
+                       href="{% url 'blog:post_update' post.id %}">Edit post</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <h3>Similar posts</h3>
+    {% for post in similar_posts %}
+        <p><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></p>
+    {% empty %}
+        <p class="text-muted">There are no similar posts</p>
+    {% endfor %}
+    <hr id="comments">
+    {% with comments|length as total_comments %}
+        <h4>{{ total_comments }} comment{{ total_comments|pluralize }}</h4>
+    {% endwith %}
+    {% for comment in comments %}
+        <div class="card mb-2">
+            <div class="card-body">
+                <p class="comment-meta mb-1"><strong>{{ comment.name }}</strong> <span aria-hidden="true">·</span> <small class="text-muted">{{ comment.created|date:"F j, Y H:i" }}</small></p>
+                <p>{{ comment.body|linebreaks }}</p>
+            </div>
+        </div>
+    {% empty %}
+        <p class="text-muted">There are no comments yet.</p>
+    {% endfor %}
+    {% include "post/includes/comment_form.html" %}
+{% endblock %}

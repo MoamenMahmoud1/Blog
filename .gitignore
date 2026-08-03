@@ -2,29 +2,56 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.so
 
-# Virtual Environment
+# Virtual environments
+.venv/
 venv/
 env/
 ENV/
 
+# Environment variables and secrets
+.env
+.env.*
+*.pem
+*.key
+*.crt
+secrets/
+
 # Django
 *.log
-local_settings.py
 db.sqlite3
 db.sqlite3-journal
-
-# Media & Static (حسب استخدامك)
+local_settings.py
 media/
 staticfiles/
 
-# Environment variables
-.env
+# Celery
+celerybeat-schedule
+celerybeat.pid
 
-# VS Code / Editors
+# Tests and code quality
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.tox/
+.nox/
+
+# Editors
 .vscode/
 .idea/
+*.swp
+*.swo
 
-# OS files
+# Frontend
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Operating systems
 .DS_Store
 Thumbs.db

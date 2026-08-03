@@ -1,0 +1,34 @@
+.article-body {
+    font-size: clamp(1rem, 1vw + 0.75rem, 1.1rem);
+    line-height: 1.8;
+}
+
+.article-body :is(img, video) {
+    display: block;
+    margin-inline: auto;
+    border-radius: var(--app-radius-sm);
+}
+
+.article-body iframe {
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 0;
+}
+
+.article-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.comment-meta {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+@media (max-width: 575.98px) {
+    .article-actions > .btn { min-height: 2.75rem; }
+}

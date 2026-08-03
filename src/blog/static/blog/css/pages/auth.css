@@ -1,0 +1,48 @@
+.auth-shell {
+    display: grid;
+    max-width: 36rem;
+    min-height: min(38rem, 70vh);
+    align-items: center;
+    margin-inline: auto;
+}
+
+.auth-card {
+    padding: clamp(1.25rem, 4vw, 2.25rem);
+    border: 1px solid var(--bs-border-color-translucent);
+    border-radius: var(--app-radius-lg);
+    background: color-mix(in srgb, var(--bs-body-bg) 95%, var(--bs-primary) 5%);
+    box-shadow: var(--app-shadow);
+}
+
+.auth-form { margin-top: 1.5rem; }
+
+.auth-form > p { margin-bottom: 1rem; }
+
+.auth-form .helptext {
+    display: block;
+    margin-top: 0.4rem;
+}
+
+.auth-form .helptext ul {
+    margin: 0.5rem 0 0;
+    padding-left: 1.25rem;
+}
+
+.auth-form .errorlist {
+    margin-bottom: 0.5rem;
+    padding-left: 1.25rem;
+}
+
+.auth-switch {
+    margin-top: 1.25rem;
+    text-align: center;
+}
+
+@media (max-width: 575.98px) {
+    .auth-shell {
+        min-height: auto;
+        align-items: start;
+    }
+
+    .auth-card { border-radius: var(--app-radius); }
+}

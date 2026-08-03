@@ -1,0 +1,48 @@
+<dialog id="searchDialog"
+        class="search-dialog"
+        data-search-url="{{ search_url }}"
+        aria-labelledby="searchDialogTitle">
+    <section class="search-panel">
+        <header class="search-panel__header">
+            <div>
+                <h2 id="searchDialogTitle" class="h5 mb-1">{{ search_title }}</h2>
+                <p class="text-body-secondary small mb-0">Results update as you type.</p>
+            </div>
+            <form method="dialog">
+                <button class="btn-close" type="submit" aria-label="Close search"></button>
+            </form>
+        </header>
+        <div class="search-field">
+            <span class="search-field__icon" aria-hidden="true">⌕</span>
+            <label class="visually-hidden" for="liveSearchInput">Search posts</label>
+            <input id="liveSearchInput"
+                   class="form-control form-control-lg"
+                   type="search"
+                   inputmode="search"
+                   minlength="2"
+                   maxlength="200"
+                   placeholder="{{ search_placeholder }}"
+                   autofocus
+                   autocomplete="off"
+                   autocapitalize="none"
+                   spellcheck="false"
+                   aria-controls="searchResults"
+                   aria-describedby="searchStatus">
+        </div>
+        <p id="searchStatus"
+           class="visually-hidden"
+           role="status"
+           aria-live="polite"></p>
+        <div id="searchResults" class="search-results" aria-busy="false">
+            <div class="search-empty-state">
+                <span aria-hidden="true">⌨</span>
+                <p class="mb-0">Type at least two characters to search.</p>
+            </div>
+        </div>
+        <footer class="search-panel__footer text-body-secondary">
+            <span><kbd>↑</kbd> <kbd>↓</kbd> navigate</span>
+            <span><kbd>Enter</kbd> open</span>
+            <span><kbd>Esc</kbd> close</span>
+        </footer>
+    </section>
+</dialog>

@@ -1,0 +1,30 @@
+[Unit]
+Description=Renew Django Blog TLS certificate
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=deploy
+Group=docker
+WorkingDirectory=/opt/django-blog
+ExecStart=/opt/django-blog/scripts/renew_tls.sh
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+
+StandardOutput=journal
+StandardError=journal

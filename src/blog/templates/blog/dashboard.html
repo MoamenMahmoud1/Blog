@@ -1,0 +1,77 @@
+{% extends "blog/base.html" %}
+{% load static %}
+{% block title %}Post dashboard{% endblock %}
+{% block extra_css %}
+    <link href="{% static 'blog/css/pages/dashboard.css' %}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <div class="content-header">
+        <h1>Post dashboard</h1>
+        {% if perms.blog.add_post %}
+            <a href="{% url 'blog:create_post' %}" class="btn btn-primary">New post</a>
+        {% endif %}
+    </div>
+    <nav class="nav nav-pills dashboard-filters mb-4"
+         aria-label="Filter posts">
+        <a class="nav-link {% if status_filter == 'all' %}active{% endif %}"
+           href="{% url 'blog:dashboard' %}">All</a>
+        <a class="nav-link {% if status_filter == 'draft' %}active{% endif %}"
+           href="?status=draft">Drafts</a>
+        <a class="nav-link {% if status_filter == 'scheduled' %}active{% endif %}"
+           href="?status=scheduled">Scheduled</a>
+        <a class="nav-link {% if status_filter == 'published' %}active{% endif %}"
+           href="?status=published">Published</a>
+    </nav>
+    {% for post in posts %}
+        <article class="card mb-3">
+            <div class="card-body">
+                <div class="dashboard-card__header">
+                    <div class="dashboard-card__summary">
+                        <h2 class="h4 mb-1">{{ post.title }}</h2>
+                        <p class="text-muted mb-2">
+                            {{ post.publication_state }} · {{ post.publish|date:"M j, Y, H:i" }}
+                            {% if request.user.is_superuser %}· {{ post.author }}{% endif %}
+                        </p>
+                    </div>
+                    <span class="badge {% if post.publication_state == 'Published' %}text-bg-success{% elif post.publication_state == 'Scheduled' %}text-bg-info{% else %}text-bg-secondary{% endif %} align-self-start">
+                        {{ post.publication_state }}
+                    </span>
+                </div>
+                <div class="dashboard-actions">
+                    {% if perms.blog.change_post %}
+                        {% if post.status == 'DF' or perms.blog.publish_post %}
+                            <a href="{% url 'blog:post_update' post.pk %}"
+                               class="btn btn-outline-primary btn-sm">Edit / preview</a>
+                        {% endif %}
+                    {% endif %}
+                    {% if perms.blog.publish_post and perms.blog.change_post %}
+                        {% if post.status == 'PB' %}
+                            <form method="post" action="{% url 'blog:post_unpublish' post.pk %}">
+                                {% csrf_token %}
+                                <button class="btn btn-outline-warning btn-sm" type="submit">Unpublish</button>
+                            </form>
+                        {% else %}
+                            <form method="post" action="{% url 'blog:post_publish' post.pk %}">
+                                {% csrf_token %}
+                                <button class="btn btn-outline-success btn-sm" type="submit">Publish</button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                    {% if post.publication_state == 'Published' %}
+                        <a href="{{ post.get_absolute_url }}"
+                           class="btn btn-outline-secondary btn-sm">View live</a>
+                    {% endif %}
+                    {% if perms.blog.delete_post %}
+                        <a href="{% url 'blog:post_delete' post.pk %}"
+                           class="btn btn-outline-danger btn-sm">Delete</a>
+                    {% endif %}
+                </div>
+            </div>
+        </article>
+    {% empty %}
+        <div class="alert alert-info">No posts match this filter.</div>
+    {% endfor %}
+    {% if is_paginated %}
+        {% include "includes/pagination.html" with page=page_obj status_filter=status_filter %}
+    {% endif %}
+{% endblock %}

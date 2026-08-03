@@ -1,0 +1,15 @@
+.search-page-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.75rem;
+}
+
+.search-page-result {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 10rem;
+    border-radius: var(--app-radius);
+}
+
+@media (max-width: 575.98px) {
+    .search-page-form { grid-template-columns: 1fr; }
+}

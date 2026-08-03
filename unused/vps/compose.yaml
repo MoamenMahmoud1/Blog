@@ -1,0 +1,250 @@
+x-django-service: &django-service
+  image: ${APP_IMAGE:-django-blog:latest}
+  build:
+    context: .
+    dockerfile: docker/django/Dockerfile
+    target: runtime
+  env_file:
+    - .env
+  environment:
+    STATIC_ROOT: /app/staticfiles
+    MEDIA_ROOT: /app/media
+  networks:
+    - backend
+  security_opt:
+    - no-new-privileges:true
+
+services:
+  db:
+    image: postgres:18.4-alpine3.24
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:?DB_NAME is required}
+      POSTGRES_USER: ${DB_USER:?DB_USER is required}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    networks:
+      - backend
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${DB_USER} -d ${DB_NAME}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    security_opt:
+      - no-new-privileges:true
+
+  cache:
+    image: redis:8.8.1-alpine3.23
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --save
+      - ""
+      - --appendonly
+      - "no"
+      - --maxmemory
+      - ${CACHE_MAX_MEMORY:-128mb}
+      - --maxmemory-policy
+      - allkeys-lru
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    security_opt:
+      - no-new-privileges:true
+
+  broker:
+    image: redis:8.8.1-alpine3.23
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --appendfsync
+      - everysec
+      - --maxmemory-policy
+      - noeviction
+    volumes:
+      - celery_broker_data:/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    security_opt:
+      - no-new-privileges:true
+
+  volumes-init:
+    <<: *django-service
+    user: root
+    restart: "no"
+    command:
+      - sh
+      - -c
+      - >
+        mkdir -p /app/staticfiles /app/media &&
+        chown -R django:django /app/staticfiles /app/media
+    volumes:
+      - static_files:/app/staticfiles
+      - media_files:/app/media
+
+  migrate:
+    <<: *django-service
+    restart: "no"
+    command: ["python", "manage.py", "migrate", "--noinput"]
+    depends_on:
+      db:
+        condition: service_healthy
+
+  collectstatic:
+    <<: *django-service
+    restart: "no"
+    command: ["python", "manage.py", "collectstatic", "--noinput"]
+    volumes:
+      - static_files:/app/staticfiles
+    depends_on:
+      volumes-init:
+        condition: service_completed_successfully
+
+  web:
+    <<: *django-service
+    restart: unless-stopped
+    command:
+      - gunicorn
+      - --config
+      - gunicorn.conf.py
+      - mysite.wsgi:application
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,noexec,nosuid
+    shm_size: 64mb
+    volumes:
+      - media_files:/app/media
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      collectstatic:
+        condition: service_completed_successfully
+      volumes-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - >
+          import os, urllib.request;
+          request = urllib.request.Request(
+          "http://127.0.0.1:8000/health/ready/",
+          headers={
+          "Host": os.environ["SITE_DOMAIN"],
+          "X-Forwarded-Proto": "https"
+          });
+          urllib.request.urlopen(request, timeout=5)
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  worker:
+    <<: *django-service
+    restart: unless-stopped
+    command:
+      - celery
+      - --app=mysite
+      - worker
+      - --loglevel=${CELERY_LOG_LEVEL:-INFO}
+      - --queues=email
+      - --concurrency=${CELERY_WORKER_CONCURRENCY:-2}
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,noexec,nosuid
+    networks:
+      - backend
+      - egress
+    depends_on:
+      broker:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    stop_grace_period: 30s
+
+  nginx:
+    image: nginx:1.30.4-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "80:80"
+      - "443:443"
+    read_only: true
+    tmpfs:
+      - /etc/nginx/conf.d:size=1m
+      - /var/cache/nginx:size=64m,noexec,nosuid
+      - /var/run:size=1m,noexec,nosuid
+      - /tmp:size=16m,noexec,nosuid
+    volumes:
+      - ./docker/nginx/templates/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - static_files:/srv/static:ro
+      - media_files:/srv/media:ro
+      - letsencrypt_data:/etc/letsencrypt:ro
+      - certbot_www:/var/www/certbot:ro
+    networks:
+      - frontend
+    depends_on:
+      web:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+
+  certbot:
+    image: certbot/certbot:v5.7.0
+    profiles:
+      - tools
+    env_file:
+      - .env
+    ports:
+      - "80:80"
+    volumes:
+      - letsencrypt_data:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    networks:
+      - frontend
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  postgres_data:
+  celery_broker_data:
+  static_files:
+  media_files:
+  letsencrypt_data:
+  certbot_www:
+
+networks:
+  frontend:
+  backend:
+    internal: true
+  egress:

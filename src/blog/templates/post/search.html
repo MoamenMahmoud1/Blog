@@ -1,0 +1,41 @@
+{% extends "blog/base.html" %}
+{% load static %}
+{% block title %}Search posts{% endblock %}
+{% block extra_css %}
+    <link href="{% static 'blog/css/components/infinite-scroll.css' %}"
+          rel="stylesheet">
+    <link href="{% static 'blog/css/pages/search.css' %}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <header class="mb-4">
+        <h1>Search posts</h1>
+        <form class="search-page-form" method="get" role="search">
+            <label class="visually-hidden" for="pageSearchInput">Search posts</label>
+            <input id="pageSearchInput"
+                   class="form-control form-control-lg"
+                   type="search"
+                   name="query"
+                   value="{{ query|default:'' }}"
+                   minlength="2"
+                   maxlength="200"
+                   placeholder="Search titles and content…"
+                   required
+                   autofocus>
+            <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+    </header>
+    {% if query %}
+        <h2 class="h5 mb-3">Results for “{{ query }}”</h2>
+        <div id="searchPageResults"
+             class="infinite-list"
+             data-infinite-list
+             data-item-label="search results">{% include "post/includes/search_page_results.html" %}</div>
+        <p class="visually-hidden"
+           data-infinite-status
+           role="status"
+           aria-live="polite"></p>
+    {% endif %}
+{% endblock %}
+{% block extra_js %}
+    <script src="{% static 'blog/js/infinite-scroll.js' %}" defer></script>
+{% endblock %}

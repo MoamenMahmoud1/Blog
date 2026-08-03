@@ -1,0 +1,23 @@
+{% extends "blog/base.html" %}
+{% load static %}
+{% block title %}Create an account{% endblock %}
+{% block extra_css %}
+    <link href="{% static 'blog/css/pages/auth.css' %}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <section class="auth-shell" aria-labelledby="signupTitle">
+        <div class="auth-card">
+            <span class="eyebrow">Join My Blog</span>
+            <h1 id="signupTitle" class="h2 mt-2">Create your account</h1>
+            <p class="text-body-secondary">Start writing drafts and managing your own posts.</p>
+            <form method="post" class="auth-form">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary w-100">Create account</button>
+            </form>
+            <p class="auth-switch text-body-secondary mb-0">
+                Already have an account? <a href="{% url 'blog:login' %}">Log in</a>
+            </p>
+        </div>
+    </section>
+{% endblock %}

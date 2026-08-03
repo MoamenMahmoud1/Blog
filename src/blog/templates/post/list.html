@@ -1,0 +1,30 @@
+{% extends "blog/base.html" %}
+{% load static %}
+{% block title %}{% if tag %}{{ tag.name }} posts{% else %}Latest posts{% endif %}{% endblock %}
+{% block extra_css %}
+    <link href="{% static 'blog/css/components/infinite-scroll.css' %}"
+          rel="stylesheet">
+    <link href="{% static 'blog/css/pages/post-list.css' %}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <header class="page-hero mb-4">
+        <span class="eyebrow">Ideas, notes and practical guides</span>
+        <h1 class="display-5 fw-bold mb-3">{% if tag %}Posts tagged “{{ tag.name }}”{% else %}Latest writing{% endif %}</h1>
+        <p class="lead text-body-secondary mb-0">Fresh articles loaded as you read—without interrupting the page.</p>
+    </header>
+    <section id="postFeed"
+             class="infinite-list"
+             data-infinite-list
+             data-item-label="posts"
+             aria-labelledby="postFeedHeading">
+        <h2 id="postFeedHeading" class="visually-hidden">Post feed</h2>
+        {% include "post/includes/post_list_items.html" %}
+    </section>
+    <p class="visually-hidden"
+       data-infinite-status
+       role="status"
+       aria-live="polite"></p>
+{% endblock %}
+{% block extra_js %}
+    <script src="{% static 'blog/js/infinite-scroll.js' %}" defer></script>
+{% endblock %}

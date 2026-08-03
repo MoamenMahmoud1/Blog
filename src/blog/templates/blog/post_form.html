@@ -1,0 +1,41 @@
+{% extends "blog/base.html" %}
+{% block title %}{% if is_update %}Edit post{% else %}Create post{% endif %}{% endblock %}
+{% block content %}
+    <div class="content-header">
+        <h1>{% if is_update %}Edit post{% else %}Create post{% endif %}</h1>
+        <a href="{% url 'blog:dashboard' %}" class="btn btn-outline-secondary">Dashboard</a>
+    </div>
+    {% if preview_html %}
+        <section class="card border-primary mb-4">
+            <div class="card-header">Preview — nothing has been saved yet</div>
+            <div class="card-body">
+                <h1>{{ preview_title }}</h1>
+                {{ preview_html }}
+            </div>
+        </section>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="d-flex flex-wrap gap-2">
+            <button type="submit"
+                    name="action"
+                    value="save_draft"
+                    class="btn btn-outline-primary">Save draft</button>
+            <button type="submit"
+                    name="action"
+                    value="preview"
+                    class="btn btn-outline-secondary">Preview</button>
+            {% if can_publish %}
+                <button type="submit" name="action" value="publish" class="btn btn-success">Publish / schedule</button>
+            {% endif %}
+        </div>
+        {% if can_publish %}
+            <p class="text-muted mt-2">
+                A future publication date schedules the post. Otherwise it is published at the current server time.
+            </p>
+        {% else %}
+            <p class="text-muted mt-2">Your post will be saved as a draft for review.</p>
+        {% endif %}
+    </form>
+{% endblock %}
