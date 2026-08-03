@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
@@ -13,6 +15,8 @@ from ..forms import CommentForm, EmailPostForm
 from ..models import Comment, Post
 from ..pagination import post_cursor_batch
 from ..selectors import published_posts
+
+logger = logging.getLogger(__name__)
 
 
 class PublishedPostMixin:
@@ -180,6 +184,7 @@ class PostShareView(LoginRequiredMixin, PublishedPostMixin, FormView):
                 fail_silently=False,
             )
         except Exception:
+            logger.exception("Post share email failed")
             cache.delete(throttle_key)
             form.add_error(
                 None,

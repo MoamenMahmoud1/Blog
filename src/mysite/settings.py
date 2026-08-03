@@ -182,10 +182,10 @@ EMAIL_TIMEOUT = config("EMAIL_TIMEOUT", default=10, cast=int)
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="webmaster@localhost")
 
 
-CELERY_BROKER_URL = config(
-    "CELERY_BROKER_URL",
-    default="redis://127.0.0.1:6380/0",
-)
+# CELERY_BROKER_URL = config(
+#    "CELERY_BROKER_URL",
+#    default="redis://127.0.0.1:6380/0",
+# )
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
