@@ -94,8 +94,8 @@ history, logs, caches, or forks may retain it.
 [ ] DATABASE_URL uses the intended Neon database and TLS
 [ ] ALLOWED_HOSTS contains only real public hostnames
 [ ] CSRF_TRUSTED_ORIGINS contains only trusted HTTPS origins
-[ ] cache and Celery use separate Redis services
-[ ] SMTP uses a revocable app password or provider credential
+[ ] if Celery is enabled, cache and broker use separate Redis services
+[ ] if email is enabled, SMTP uses a revocable app password or provider credential
 [ ] /health/ready/ returns 200 after deployment
 [ ] anonymous and ordinary users receive 404 for /admin/
 [ ] Django check --deploy has no unresolved warnings
@@ -117,7 +117,8 @@ conservative because enabling them prematurely can make subdomains unreachable.
 - Uploaded image content is accepted through Django/Pillow validation, but a
   dedicated object-storage and malware-scanning pipeline would be appropriate
   for higher-risk public uploads.
-- A persistent Render disk ties media to one web instance.
+- Free-trial media is ephemeral. The paid Render disk makes it persistent but
+  ties media to one web instance.
 
 ## Reporting a vulnerability
 

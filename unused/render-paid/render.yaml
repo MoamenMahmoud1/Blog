@@ -1,0 +1,154 @@
+services:
+  - type: keyvalue
+    name: django-blog-cache
+    plan: starter
+    region: frankfurt
+    ipAllowList: []
+    maxmemoryPolicy: allkeys-lru
+    persistenceMode: off
+
+  - type: keyvalue
+    name: django-blog-broker
+    plan: starter
+    region: frankfurt
+    ipAllowList: []
+    maxmemoryPolicy: noeviction
+    persistenceMode: journal-snapshot
+
+  - type: web
+    name: django-blog-web
+    runtime: docker
+    plan: starter
+    region: frankfurt
+    dockerfilePath: ./docker/django/Dockerfile
+    dockerContext: .
+    dockerCommand: gunicorn --config gunicorn.conf.py mysite.wsgi:application
+    preDeployCommand: python manage.py migrate --noinput
+    healthCheckPath: /health/ready/
+    autoDeployTrigger: checksPass
+    maxShutdownDelaySeconds: 30
+    disk:
+      name: django-blog-media
+      mountPath: /app/media
+      sizeGB: 1
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: mysite.settings_production
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: DB_CONN_MAX_AGE
+        value: "60"
+      - key: ALLOWED_HOSTS
+        sync: false
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false
+      - key: CACHE_URL
+        fromService:
+          type: keyvalue
+          name: django-blog-cache
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        fromService:
+          type: keyvalue
+          name: django-blog-broker
+          property: connectionString
+      - key: STATIC_ROOT
+        value: /app/staticfiles
+      - key: MEDIA_ROOT
+        value: /app/media
+      - key: WEB_CONCURRENCY
+        value: "2"
+      - key: GUNICORN_THREADS
+        value: "2"
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_HOST_USER
+        sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+      - key: DEFAULT_FROM_EMAIL
+        sync: false
+      - key: EMAIL_PORT
+        value: "587"
+      - key: EMAIL_USE_TLS
+        value: "True"
+      - key: SECURE_HSTS_INCLUDE_SUBDOMAINS
+        value: "False"
+      - key: SECURE_HSTS_PRELOAD
+        value: "False"
+
+  - type: worker
+    name: django-blog-worker
+    runtime: docker
+    plan: starter
+    region: frankfurt
+    dockerfilePath: ./docker/django/Dockerfile
+    dockerContext: .
+    dockerCommand: celery --app=mysite worker --loglevel=INFO --queues=email --concurrency=2
+    autoDeployTrigger: checksPass
+    maxShutdownDelaySeconds: 30
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: mysite.settings_production
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DJANGO_SECRET_KEY
+        fromService:
+          type: web
+          name: django-blog-web
+          envVarKey: DJANGO_SECRET_KEY
+      - key: DATABASE_URL
+        fromService:
+          type: web
+          name: django-blog-web
+          envVarKey: DATABASE_URL
+      - key: DB_CONN_MAX_AGE
+        value: "60"
+      - key: ALLOWED_HOSTS
+        fromService:
+          type: web
+          name: django-blog-web
+          envVarKey: ALLOWED_HOSTS
+      - key: CSRF_TRUSTED_ORIGINS
+        fromService:
+          type: web
+          name: django-blog-web
+          envVarKey: CSRF_TRUSTED_ORIGINS
+      - key: CACHE_URL
+        fromService:
+          type: keyvalue
+          name: django-blog-cache
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        fromService:
+          type: keyvalue
+          name: django-blog-broker
+          property: connectionString
+      - key: EMAIL_HOST
+        fromService:
+          type: web
+          name: django-blog-web
+          envVarKey: EMAIL_HOST
+      - key: EMAIL_HOST_USER
+        fromService:
+          type: web
+          name: django-blog-web
+          envVarKey: EMAIL_HOST_USER
+      - key: EMAIL_HOST_PASSWORD
+        fromService:
+          type: web
+          name: django-blog-web
+          envVarKey: EMAIL_HOST_PASSWORD
+      - key: DEFAULT_FROM_EMAIL
+        fromService:
+          type: web
+          name: django-blog-web
+          envVarKey: DEFAULT_FROM_EMAIL
+      - key: EMAIL_PORT
+        value: "587"
+      - key: EMAIL_USE_TLS
+        value: "True"

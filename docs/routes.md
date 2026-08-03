@@ -22,7 +22,7 @@ checks, and protected management actions.
 | `GET` | `/blog/tag/<tag_slug>/` | Public | Published posts restricted to one tag |
 | `GET` | `/blog/<year>/<month>/<day>/<post>/` | Public | Published post, active comments, and related posts |
 | `POST` | `/blog/<post_id>/comment/` | Public | Add a validated comment; throttled per post and client address |
-| `GET`, `POST` | `/blog/<post_id>/share/` | Signed-in user | Queue a share email; submissions are throttled per user |
+| `GET`, `POST` | `/blog/<post_id>/share/` | Signed-in user | Queue a share email when the Celery deployment profile is active; submissions are throttled per user |
 | `GET` | `/blog/search/` | Public | Ranked search; `query` is required and `page` loads another batch |
 | `GET` | `/blog/search/suggestions/` | Public | Up to eight suggestion rows as an HTML fragment; uses `q` |
 | `GET` | `/blog/feed/` | Public | RSS feed of latest published posts |
@@ -53,6 +53,10 @@ X-Requested-With: XMLHttpRequest
 New non-superuser accounts receive `view_post`, `add_post`, `change_post`, and
 `delete_post` through the `Blog authors` group. The custom `publish_post`
 permission must be granted separately by an administrator.
+
+The active free Render trial has no Celery broker or worker, so share-email
+submission returns the form with a temporary-unavailability message. The paid
+profile preserved under `unused/render-paid/` enables delivery.
 
 ## Discovery and operations
 

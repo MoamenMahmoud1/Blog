@@ -16,7 +16,7 @@ PostgreSQL, Redis, Celery, and progressive enhancement.
 - Author dashboard with object-level ownership rules and explicit permissions.
 - Safe Markdown rendering through a strict HTML allowlist.
 - Comments, tags, related posts, RSS, and an XML sitemap.
-- Asynchronous email delivery with Celery and a dedicated Redis broker.
+- Optional asynchronous email delivery with Celery in the paid deployment profile.
 - Redis caching, rate limiting, health checks, and production security headers.
 - Responsive UI with page-specific CSS and JavaScript.
 - Docker image, Render Blueprint, GitHub Actions, and Dependabot configuration.
@@ -38,13 +38,9 @@ PostgreSQL, Redis, Celery, and progressive enhancement.
                       └───────┬───────────┬───────────┬───────┘
                               │           │           │
                     ┌─────────▼───┐ ┌─────▼─────┐ ┌──▼───────────┐
-                    │ Neon        │ │ Redis     │ │ Render Disk  │
+                    │ Neon        │ │ Redis     │ │ Ephemeral    │
                     │ PostgreSQL  │ │ cache     │ │ profile media│
                     └─────────────┘ └───────────┘ └──────────────┘
-
-                      ┌──────────────┐      ┌──────────────┐
-                      │ Redis broker │─────►│ Celery worker│─────► SMTP
-                      └──────────────┘      └──────────────┘
 ```
 
 For component boundaries and request flows, see
@@ -120,8 +116,10 @@ The complete method, authentication, permission, and response reference is in
 │   │   └── static/blog/       # namespaced, page-scoped frontend assets
 │   ├── mysite/                # settings, routing, health, WSGI, ASGI
 │   └── manage.py
-├── unused/vps/                # archived VPS/Compose deployment files
-├── render.yaml                # active Render infrastructure definition
+├── unused/
+│   ├── render-paid/           # archived paid Render worker/disk profile
+│   └── vps/                   # archived VPS/Compose deployment files
+├── render.yaml                # active free Render trial definition
 └── requirements*.txt
 ```
 
@@ -147,10 +145,12 @@ Or run the configured local hooks against every tracked file:
 
 ## ⇢ Production
 
-The active deployment target is Render for the web service, worker, cache,
-broker, and media disk, with Neon providing PostgreSQL. Start with the
-[Deployment runbook](docs/deployment.md), then complete the
-[Security checklist](docs/security.md).
+The active deployment is a free Render trial using one web service and one
+cache, with Neon providing PostgreSQL. It intentionally excludes the Celery
+worker and persistent media disk. Start with the
+[Deployment runbook](docs/deployment.md), then complete the [Security
+checklist](docs/security.md). The full paid profile is preserved under
+`unused/render-paid/` for a future production upgrade.
 
 ## Documentation
 

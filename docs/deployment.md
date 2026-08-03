@@ -1,30 +1,44 @@
-# Render + Neon Deployment
+# Free Render Trial + Neon
 
-This is the production runbook for the active deployment target. Files under
-`unused/vps/` are archived and are not part of these steps.
+The active `render.yaml` is intentionally designed for a zero-cost evaluation.
+It is useful for testing the blog, but it is not the final production topology.
+The complete paid profile remains in `unused/render-paid/render.yaml`.
 
-## Target topology
+## Active topology
 
 ```text
 GitHub main
    │ checks pass
    ▼
 Render Blueprint
-   ├── Web service ───────┬── Neon PostgreSQL (pooled, TLS)
-   │                      ├── Redis cache
-   │                      └── persistent media disk
-   ├── Celery worker ─────┬── Redis broker
-   │                      └── SMTP provider
-   ├── Redis cache
-   └── Redis broker
+   ├── Free web service ─────┬── Neon PostgreSQL (pooled, TLS)
+   │                         ├── Free Render Key Value cache
+   │                         └── ephemeral profile media
+   └── Free Key Value cache
+
+Not deployed: Celery worker · Redis broker · persistent disk
 ```
+
+## Free-tier limitations
+
+- The web service can sleep while idle, so its first request can be slow.
+- Uploaded profile images can disappear after a restart or deployment.
+- Share-email delivery is unavailable because there is no Celery worker.
+- Migrations run when the web service starts instead of in a separate
+  pre-deploy phase.
+- The free configuration uses one Gunicorn worker with two threads to stay
+  within the smaller memory allowance.
+
+Posts, users, comments, tags, and permissions remain persistent because they are
+stored in Neon rather than on Render's filesystem.
 
 ## 1. Prepare Neon
 
-1. Create the Neon project in the same geographic area as the Render services.
-2. Copy the **pooled** PostgreSQL connection string.
-3. Confirm the host identifies the pooler and the URL requires TLS.
-4. Keep the value private; it becomes Render's `DATABASE_URL` secret.
+1. Rotate any credential that has been pasted into a message, log, or issue.
+2. Create or select the Neon project near Render's Frankfurt region when
+   possible.
+3. Copy the **pooled** connection string from Neon's Connect dialog.
+4. Confirm it requires TLS and keep it private.
 
 Expected shape:
 
@@ -32,131 +46,129 @@ Expected shape:
 postgresql://USER:PASSWORD@POOLER_HOST/DATABASE?sslmode=require
 ```
 
-The application enables persistent connections and connection health checks.
-The default `DB_CONN_MAX_AGE` is 60 seconds.
+The active app uses persistent connections with a 60-second maximum age and
+connection health checks.
 
 ## 2. Push the repository
 
-Push the reviewed branch to GitHub. CI must pass its lint, Django check,
-migration check, tests, and Docker build before Render automatically deploys
-`main`.
+Push the reviewed `main` branch to GitHub. GitHub Actions checks Python,
+templates, Django configuration, migrations, tests, and the production Docker
+image before Render automatically deploys it.
 
-## 3. Create the Render Blueprint
+## 3. Create the Blueprint
 
-In Render, create a Blueprint from the repository's `render.yaml`. It defines:
+1. Open the Render Dashboard.
+2. Choose **New → Blueprint**.
+3. Connect the GitHub repository and select `main`.
+4. Confirm Render detected the root `render.yaml`.
+5. Review that both resources show the free plan before applying.
+
+The Blueprint creates only:
 
 - `django-blog-web`
-- `django-blog-worker`
 - `django-blog-cache`
-- `django-blog-broker`
-- the profile-media disk attached to the web service
 
-The web image runs Gunicorn. Before each deployment becomes live, Render runs:
+The web start command performs the migration and starts Gunicorn only if the
+migration succeeds:
 
 ```bash
-python manage.py migrate --noinput
+python manage.py migrate --noinput && \
+  exec gunicorn --config gunicorn.conf.py mysite.wsgi:application
 ```
 
-Static files are collected while building the Docker image and served by
-WhiteNoise using hashed, compressed filenames.
+Static files are collected during the Docker build and served by WhiteNoise
+using hashed, compressed filenames.
 
-## 4. Set required secrets
+## 4. Supply the required values
 
-Values marked `sync: false` must be supplied in the Render dashboard.
+Render generates `DJANGO_SECRET_KEY`. Supply the three values marked
+`sync: false` in the Blueprint form:
 
-| Variable | Example / rule |
+| Variable | Value |
 | --- | --- |
-| `DATABASE_URL` | Neon pooled URL with `sslmode=require` |
-| `ALLOWED_HOSTS` | `blog.example.com` without scheme or path |
-| `CSRF_TRUSTED_ORIGINS` | `https://blog.example.com` with scheme |
-| `EMAIL_HOST_USER` | SMTP account username |
-| `EMAIL_HOST_PASSWORD` | SMTP app password or provider secret |
-| `DEFAULT_FROM_EMAIL` | `My Blog <noreply@example.com>` |
+| `DATABASE_URL` | Rotated Neon pooled URL with `sslmode=require` |
+| `ALLOWED_HOSTS` | Public hostname without scheme or path |
+| `CSRF_TRUSTED_ORIGINS` | Matching public origin beginning with `https://` |
 
-Render generates `DJANGO_SECRET_KEY`. The worker receives the same value from
-the web service. Do not paste secrets into `render.yaml`, `.env`, screenshots,
-issues, or logs.
-
-Multiple hosts and trusted origins are comma-separated:
+For the initial Render hostname:
 
 ```text
-ALLOWED_HOSTS=blog.example.com,www.blog.example.com
-CSRF_TRUSTED_ORIGINS=https://blog.example.com,https://www.blog.example.com
+ALLOWED_HOSTS=django-blog-web.onrender.com
+CSRF_TRUSTED_ORIGINS=https://django-blog-web.onrender.com
 ```
 
-Render's generated hostname is added automatically through
-`RENDER_EXTERNAL_HOSTNAME`.
+Use the hostname Render actually assigns if it differs. Django also appends
+Render's `RENDER_EXTERNAL_HOSTNAME` automatically at runtime. Multiple values
+are comma-separated.
 
-## 5. Deploy and verify
+Never paste secrets into `render.yaml`, source control, screenshots, issues, or
+application logs.
 
-Watch the first deployment until the migration and health check complete. Then
-verify:
+## 5. Verify the first deployment
+
+Wait for the Docker build, migration, Gunicorn startup, and readiness check.
+Then verify:
 
 ```text
 ✓ /health/live/  returns 200
 ✓ /health/ready/ returns 200
 ✓ /blog/ renders over HTTPS
-✓ /static/... assets load with hashed filenames
-✓ signup creates an author account and profile
-✓ search returns ranked results and loads another batch
-✓ a share request reaches the Celery worker and SMTP provider
+✓ static assets load
+✓ signup creates a profile and author permissions
+✓ posts persist across a new deployment
+✓ search suggestions and progressive loading work
+✓ comments can be created
 ✓ unauthorized /admin/ requests return 404
-✓ /blog/feed/ and /sitemap.xml are valid
+✓ /blog/feed/ and /sitemap.xml are available
+⚠ uploaded images are treated as temporary
+⚠ share email reports unavailable while the worker is absent
 ```
 
-Create the first administrator from a Render Shell:
+Create the first administrator using a Render Shell if the dashboard exposes
+one for the service plan:
 
 ```bash
 python manage.py createsuperuser
 ```
 
-## 6. Attach the custom domain
+If an interactive shell is unavailable on the free plan, create the
+administrator locally against the same Neon database, then remove the database
+URL from shell history where applicable.
 
-Add the domain in Render, apply the DNS records Render provides, then update
+## 6. Add a custom domain later
+
+Add the domain in Render, apply the DNS records it provides, then update
 `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS`. Production always redirects HTTP to
-HTTPS. Do not enable HSTS for every subdomain or request preload until every
+HTTPS. Do not enable HSTS for all subdomains or request preload until every
 subdomain is permanently HTTPS-only.
 
-## Pre-deployment verification
+## Upgrade to the paid profile
 
-Use production-like values without committing them:
+The archived profile adds:
 
-```bash
-DJANGO_SETTINGS_MODULE=mysite.settings_production \
-DJANGO_DEBUG=False \
-DJANGO_SECRET_KEY='replace-with-a-random-value-of-at-least-50-characters' \
-ALLOWED_HOSTS='blog.example.com' \
-CSRF_TRUSTED_ORIGINS='https://blog.example.com' \
-DATABASE_URL='postgresql://user:password@host/database?sslmode=require' \
-CACHE_URL='redis://host:6379/1' \
-CELERY_BROKER_URL='redis://host:6379/0' \
-.venv/bin/python src/manage.py check --deploy \
-  --settings=mysite.settings_production
-```
+- a dedicated Celery worker;
+- a dedicated Redis broker with a non-evicting persistence policy;
+- SMTP configuration;
+- a persistent media disk;
+- a separate pre-deploy migration command;
+- two Gunicorn workers.
 
-Run this against disposable or intended infrastructure; the readiness check and
-test suite may contact configured services.
+When ready to upgrade, review—not blindly copy—the current provider plans and
+then promote `unused/render-paid/render.yaml` back to the repository root. Keep
+cache and broker separate. For horizontal scaling, use object storage instead
+of the attached disk.
 
-## Rollout and rollback
+## Rollout safety
 
-- Database migrations must be backward-compatible with the previously deployed
-  application during rollout.
+- Make migrations backward-compatible with the previously deployed code.
 - Deploy schema additions before code that depends exclusively on them.
-- Avoid destructive migrations in the same release that stops reading the old
-  schema.
-- Roll back the Render deploy if application health fails.
-- A code rollback does not automatically reverse a database migration.
-- Take a Neon restore point or branch before destructive data changes.
-
-## Scaling note
-
-The attached Render disk is appropriate for the current single web instance,
-but it prevents horizontal web scaling and zero-downtime disk movement. Move
-profile media to object storage before adding web instances. PostgreSQL, cache,
-broker, and static files are already external or immutable.
+- Separate destructive cleanup from the release that stops using old fields.
+- A code rollback does not reverse a database migration.
+- Create a Neon restore point or branch before destructive data changes.
 
 ## Provider references
 
+- [Render free instances](https://render.com/docs/free)
 - [Render Blueprint specification](https://render.com/docs/blueprint-spec)
 - [Render Django deployment guide](https://render.com/docs/deploy-django)
 - [Neon connection pooling](https://neon.com/docs/connect/connection-pooling)

@@ -123,7 +123,19 @@ afterward:
 This keeps navigation usable without JavaScript, avoids downloading the full
 page for each progressive load, and retains Django's normal template workflow.
 
-## Runtime topology
+## Runtime topologies
+
+### Active free trial
+
+```text
+Render web ──────────────┬──── Neon pooled PostgreSQL
+                        ├──── Redis cache
+                        └──── ephemeral profile media
+
+Not deployed: Celery worker, Redis broker, persistent media disk
+```
+
+### Archived paid profile
 
 ```text
 Render web ──────────────┬──── Neon pooled PostgreSQL
@@ -138,16 +150,18 @@ Static files: image build → collectstatic → WhiteNoise → immutable hashed 
 ```
 
 The application remains synchronous WSGI because its request work is primarily
-Django ORM and template rendering. Celery isolates slow email I/O. ASGI entry
-points are retained for future use but switching servers alone would not make
-the synchronous ORM and views asynchronous.
+Django ORM and template rendering. In the paid profile, Celery isolates slow
+email I/O. ASGI entry points are retained for future use but switching servers
+alone would not make the synchronous ORM and views asynchronous.
 
 ## Deliberate boundaries
 
 - `unused/vps/` is an archive, not active deployment configuration.
 - Uploaded media is not served by WhiteNoise; the application exposes only the
-  restricted profile-image subtree from the attached disk.
-- Cache and broker use separate Redis services and eviction policies.
+  restricted profile-image subtree. Free-trial media is ephemeral; the paid
+  profile adds a persistent disk.
+- The paid profile gives cache and broker separate Redis services and eviction
+  policies. The free profile does not deploy Celery or a broker.
 - Swagger/OpenAPI is deferred until a real versioned HTTP API exists.
 
 ## Further reading
