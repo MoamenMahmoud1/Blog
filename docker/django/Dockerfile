@@ -32,8 +32,11 @@ COPY --from=builder /opt/venv /opt/venv
 COPY --chown=django:django src/ ./
 COPY --chown=django:django docker/django/gunicorn.conf.py ./gunicorn.conf.py
 
-RUN mkdir -p /app/staticfiles /app/media \
-    && chown -R django:django /app/staticfiles /app/media
+RUN mkdir -p /app/staticfiles /app/media /app/.gunicorn \
+    && chown -R django:django \
+        /app/staticfiles \
+        /app/media \
+        /app/.gunicorn
 
 USER django
 
