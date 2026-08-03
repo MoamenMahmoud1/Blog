@@ -35,8 +35,8 @@ stored in Neon rather than on Render's filesystem.
 ## 1. Prepare Neon
 
 1. Rotate any credential that has been pasted into a message, log, or issue.
-2. Create or select the Neon project near Render's Frankfurt region when
-   possible.
+2. Keep the Neon project in AWS `us-east-2` and deploy Render in Ohio so the
+   application and database remain in the same geographic region.
 3. Copy the **pooled** connection string from Neon's Connect dialog.
 4. Confirm it requires TLS and keep it private.
 

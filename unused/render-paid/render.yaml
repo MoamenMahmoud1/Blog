@@ -2,7 +2,7 @@ services:
   - type: keyvalue
     name: django-blog-cache
     plan: starter
-    region: frankfurt
+    region: ohio
     ipAllowList: []
     maxmemoryPolicy: allkeys-lru
     persistenceMode: off
@@ -10,7 +10,7 @@ services:
   - type: keyvalue
     name: django-blog-broker
     plan: starter
-    region: frankfurt
+    region: ohio
     ipAllowList: []
     maxmemoryPolicy: noeviction
     persistenceMode: journal-snapshot
@@ -19,7 +19,7 @@ services:
     name: django-blog-web
     runtime: docker
     plan: starter
-    region: frankfurt
+    region: ohio
     dockerfilePath: ./docker/django/Dockerfile
     dockerContext: .
     dockerCommand: gunicorn --config gunicorn.conf.py mysite.wsgi:application
@@ -85,7 +85,7 @@ services:
     name: django-blog-worker
     runtime: docker
     plan: starter
-    region: frankfurt
+    region: ohio
     dockerfilePath: ./docker/django/Dockerfile
     dockerContext: .
     dockerCommand: celery --app=mysite worker --loglevel=INFO --queues=email --concurrency=2

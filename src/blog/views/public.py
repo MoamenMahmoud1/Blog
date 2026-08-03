@@ -1,18 +1,18 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
+from django.core.mail import send_mail
 from django.db.models import Count, Prefetch
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.utils.functional import cached_property
 from django.views.generic import DetailView, FormView, ListView
-from kombu.exceptions import OperationalError
 from taggit.models import Tag
 
 from ..forms import CommentForm, EmailPostForm
 from ..models import Comment, Post
 from ..pagination import post_cursor_batch
 from ..selectors import published_posts
-from ..tasks import send_post_share_email
 
 
 class PublishedPostMixin:
@@ -126,7 +126,10 @@ class PostShareView(LoginRequiredMixin, PublishedPostMixin, FormView):
 
     @cached_property
     def post_object(self):
-        return get_object_or_404(self.get_queryset(), pk=self.kwargs["post_id"])
+        return get_object_or_404(
+            self.get_queryset(),
+            pk=self.kwargs["post_id"],
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -135,29 +138,61 @@ class PostShareView(LoginRequiredMixin, PublishedPostMixin, FormView):
         return context
 
     def form_valid(self, form):
-        throttle_key = f"post-share:{self.request.user.pk}"
-        if not cache.add(throttle_key, True, timeout=60):
-            form.add_error(None, "Please wait before sending another email.")
+        data = form.cleaned_data
+        recipient_email = data["to"].strip()
+
+        User = get_user_model()
+
+        if not User.objects.filter(
+            email__iexact=recipient_email,
+        ).exists():
+            form.add_error(
+                "to",
+                "This email does not belong to a registered user.",
+            )
             return self.form_invalid(form)
 
-        data = form.cleaned_data
+        throttle_key = f"post-share:{self.request.user.pk}"
+
+        if not cache.add(throttle_key, True, timeout=60):
+            form.add_error(
+                None,
+                "Please wait before sending another email.",
+            )
+            return self.form_invalid(form)
+
         post_url = self.request.build_absolute_uri(self.post_object.get_absolute_url())
         safe_title = " ".join(self.post_object.title.splitlines())
+
         subject = f"{data['name']} ({data['email']}) recommends you read {safe_title}"
+
         message = (
             f"Read {self.post_object.title} at {post_url}\n\n"
             f"{data['name']}'s comments: {data['comments']}"
         )
+
         try:
-            send_post_share_email.delay(subject, message, data["to"])
-        except OperationalError:
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=None,
+                recipient_list=[recipient_email],
+                fail_silently=False,
+            )
+        except Exception:
             cache.delete(throttle_key)
             form.add_error(
                 None,
                 "Email delivery is temporarily unavailable. Please try again.",
             )
             return self.form_invalid(form)
-        return self.render_to_response(self.get_context_data(form=form, sent=True))
+
+        return self.render_to_response(
+            self.get_context_data(
+                form=form,
+                sent=True,
+            )
+        )
 
 
 class PostCommentView(FormView):

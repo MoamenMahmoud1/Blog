@@ -2,7 +2,7 @@ services:
   - type: keyvalue
     name: django-blog-cache
     plan: free
-    region: frankfurt
+    region: ohio
     ipAllowList: []
     maxmemoryPolicy: allkeys-lru
     persistenceMode: off
@@ -11,7 +11,7 @@ services:
     name: django-blog-web
     runtime: docker
     plan: free
-    region: frankfurt
+    region: ohio
     dockerfilePath: ./docker/django/Dockerfile
     dockerContext: .
     dockerCommand: >-
