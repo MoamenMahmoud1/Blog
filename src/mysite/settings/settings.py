@@ -5,11 +5,16 @@ from decouple import Csv, config
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.csp import CSP
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
-_DEVELOPMENT_SECRET = "django-insecure-development-only-change-me"
-SECRET_KEY = config("DJANGO_SECRET_KEY", default=_DEVELOPMENT_SECRET)
+
+_DEVELOPMENT_SECRET = "django-insecure-development-only-change-me"  # noqa: S105
+
+SECRET_KEY = config(
+    "DJANGO_SECRET_KEY",
+    default=_DEVELOPMENT_SECRET,
+)
 
 
 def validate_production_secret_key(secret_key):
@@ -27,14 +32,25 @@ def validate_production_secret_key(secret_key):
 
 if not DEBUG:
     validate_production_secret_key(SECRET_KEY)
-SECRET_KEY_FALLBACKS = config("DJANGO_SECRET_KEY_FALLBACKS", default="", cast=Csv())
+
+
+SECRET_KEY_FALLBACKS = config(
+    "DJANGO_SECRET_KEY_FALLBACKS",
+    default="",
+    cast=Csv(),
+)
 
 ALLOWED_HOSTS = config(
     "ALLOWED_HOSTS",
     default="localhost,127.0.0.1,[::1]",
     cast=Csv(),
 )
-CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="", cast=Csv())
+
+CSRF_TRUSTED_ORIGINS = config(
+    "CSRF_TRUSTED_ORIGINS",
+    default="",
+    cast=Csv(),
+)
 
 
 INSTALLED_APPS = [
@@ -49,9 +65,10 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     "taggit",
     "blog.apps.BlogConfig",
-    "presentations.apps.PresentationsConfig",
+    "presentation.apps.PresentationConfig",
     "easy_thumbnails",
 ]
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -66,12 +83,16 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+
 ROOT_URLCONF = "mysite.urls"
+
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
+        "DIRS": [
+            BASE_DIR / "templates",
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -84,12 +105,17 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = "mysite.wsgi.application"
 ASGI_APPLICATION = "mysite.asgi.application"
 
 
 database_url = config("DATABASE_URL", default="")
-db_conn_max_age = config("DB_CONN_MAX_AGE", default=60, cast=int)
+db_conn_max_age = config(
+    "DB_CONN_MAX_AGE",
+    default=60,
+    cast=int,
+)
 
 if database_url:
     DATABASES = {
@@ -117,28 +143,47 @@ else:
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+        ),
     },
     {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "NAME": ("django.contrib.auth.password_validation.MinimumLengthValidator"),
     },
     {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+        "NAME": ("django.contrib.auth.password_validation.CommonPasswordValidator"),
     },
     {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+        "NAME": ("django.contrib.auth.password_validation.NumericPasswordValidator"),
     },
 ]
 
+
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
+
 USE_I18N = True
 USE_TZ = True
 
+
 STATIC_URL = "/static/"
-STATIC_ROOT = Path(config("STATIC_ROOT", default=BASE_DIR.parent / "staticfiles"))
+
+STATIC_ROOT = Path(
+    config(
+        "STATIC_ROOT",
+        default=BASE_DIR.parent / "staticfiles",
+    )
+)
+
 MEDIA_URL = "/media/"
-MEDIA_ROOT = Path(config("MEDIA_ROOT", default=BASE_DIR.parent / "media"))
+
+MEDIA_ROOT = Path(
+    config(
+        "MEDIA_ROOT",
+        default=BASE_DIR.parent / "media",
+    )
+)
+
 
 STORAGES = {
     "default": {
@@ -153,14 +198,23 @@ STORAGES = {
     },
 }
 
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 LOGIN_URL = "blog:login"
+
 
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": config("CACHE_URL", default="redis://127.0.0.1:6379/1"),
-        "KEY_PREFIX": config("CACHE_KEY_PREFIX", default="django-blog"),
+        "LOCATION": config(
+            "CACHE_URL",
+            default="redis://127.0.0.1:6379/1",
+        ),
+        "KEY_PREFIX": config(
+            "CACHE_KEY_PREFIX",
+            default="django-blog",
+        ),
         "TIMEOUT": 300,
         "OPTIONS": {
             "socket_connect_timeout": 2,
@@ -174,71 +228,166 @@ EMAIL_BACKEND = config(
     "EMAIL_BACKEND",
     default="django.core.mail.backends.smtp.EmailBackend",
 )
-EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com")
-EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
-EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
-EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
-EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
-EMAIL_TIMEOUT = config("EMAIL_TIMEOUT", default=10, cast=int)
-DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="webmaster@localhost")
+
+EMAIL_HOST = config(
+    "EMAIL_HOST",
+    default="smtp.gmail.com",
+)
+
+EMAIL_HOST_USER = config(
+    "EMAIL_HOST_USER",
+    default="",
+)
+
+EMAIL_HOST_PASSWORD = config(
+    "EMAIL_HOST_PASSWORD",
+    default="",
+)
+
+EMAIL_PORT = config(
+    "EMAIL_PORT",
+    default=587,
+    cast=int,
+)
+
+EMAIL_USE_TLS = config(
+    "EMAIL_USE_TLS",
+    default=True,
+    cast=bool,
+)
+
+EMAIL_TIMEOUT = config(
+    "EMAIL_TIMEOUT",
+    default=10,
+    cast=int,
+)
+
+DEFAULT_FROM_EMAIL = config(
+    "DEFAULT_FROM_EMAIL",
+    default="webmaster@localhost",
+)
 
 
-# CELERY_BROKER_URL = config(
-#    "CELERY_BROKER_URL",
-#    default="redis://127.0.0.1:6380/0",
-# )
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_TASK_IGNORE_RESULT = True
+
 CELERY_TASK_ROUTES = {
-    "blog.tasks.send_post_share_email": {"queue": "email"},
+    "blog.tasks.send_post_share_email": {
+        "queue": "email",
+    },
 }
+
 CELERY_TASK_SOFT_TIME_LIMIT = 20
 CELERY_TASK_TIME_LIMIT = 30
 
 
-SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", default=not DEBUG, cast=bool)
-SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE", default=not DEBUG, cast=bool)
-CSRF_COOKIE_SECURE = config("CSRF_COOKIE_SECURE", default=not DEBUG, cast=bool)
+SECURE_SSL_REDIRECT = config(
+    "SECURE_SSL_REDIRECT",
+    default=not DEBUG,
+    cast=bool,
+)
+
+SESSION_COOKIE_SECURE = config(
+    "SESSION_COOKIE_SECURE",
+    default=not DEBUG,
+    cast=bool,
+)
+
+CSRF_COOKIE_SECURE = config(
+    "CSRF_COOKIE_SECURE",
+    default=not DEBUG,
+    cast=bool,
+)
+
 SECURE_HSTS_SECONDS = config(
     "SECURE_HSTS_SECONDS",
     default=0 if DEBUG else 31_536_000,
     cast=int,
 )
+
 SECURE_HSTS_INCLUDE_SUBDOMAINS = config(
     "SECURE_HSTS_INCLUDE_SUBDOMAINS",
     default=False,
     cast=bool,
 )
-SECURE_HSTS_PRELOAD = config("SECURE_HSTS_PRELOAD", default=False, cast=bool)
+
+SECURE_HSTS_PRELOAD = config(
+    "SECURE_HSTS_PRELOAD",
+    default=False,
+    cast=bool,
+)
+
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "same-origin"
+
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
+
 X_FRAME_OPTIONS = "DENY"
 
+
 SECURE_CSP = {
-    "default-src": [CSP.SELF],
-    "base-uri": [CSP.SELF],
-    "connect-src": [CSP.SELF],
-    "font-src": [CSP.SELF, "https://cdn.jsdelivr.net"],
-    "form-action": [CSP.SELF],
-    "frame-ancestors": [CSP.NONE],
-    "img-src": [CSP.SELF, "data:"],
-    "object-src": [CSP.NONE],
-    "script-src": [CSP.SELF, "https://cdn.jsdelivr.net"],
-    "style-src": [CSP.SELF, "https://cdn.jsdelivr.net", CSP.UNSAFE_INLINE],
+    "default-src": [
+        CSP.SELF,
+    ],
+    "base-uri": [
+        CSP.SELF,
+    ],
+    "connect-src": [
+        CSP.SELF,
+    ],
+    "font-src": [
+        CSP.SELF,
+        "https://cdn.jsdelivr.net",
+    ],
+    "form-action": [
+        CSP.SELF,
+    ],
+    "frame-ancestors": [
+        CSP.NONE,
+    ],
+    "img-src": [
+        CSP.SELF,
+        "data:",
+    ],
+    "object-src": [
+        CSP.NONE,
+    ],
+    "script-src": [
+        CSP.SELF,
+        "https://cdn.jsdelivr.net",
+    ],
+    "style-src": [
+        CSP.SELF,
+        "https://cdn.jsdelivr.net",
+        CSP.UNSAFE_INLINE,
+    ],
 }
 
-if config("TRUST_X_FORWARDED_PROTO", default=False, cast=bool):
-    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+if config(
+    "TRUST_X_FORWARDED_PROTO",
+    default=False,
+    cast=bool,
+):
+    SECURE_PROXY_SSL_HEADER = (
+        "HTTP_X_FORWARDED_PROTO",
+        "https",
+    )
 
 
 THUMBNAIL_ALIASES = {
     "": {
-        "avatar": {"size": (150, 150), "crop": True},
-        "medium": {"size": (400, 400), "crop": False},
+        "avatar": {
+            "size": (150, 150),
+            "crop": True,
+        },
+        "medium": {
+            "size": (400, 400),
+            "crop": False,
+        },
     },
 }

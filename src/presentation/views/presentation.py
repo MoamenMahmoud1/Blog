@@ -5,10 +5,10 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views import View
 
-from presentations.models import Presentation
-from presentations.selectors import get_presentation_with_cards
-from presentations.serializers import serialize_presentation
-from presentations.services import create_presentation
+from presentation.models import Presentation
+from presentation.selectors import get_presentation_with_cards
+from presentation.serializers import serialize_presentation
+from presentation.services import create_presentation
 
 
 class PresentationListView(View):
@@ -27,7 +27,7 @@ class PresentationListView(View):
 
         return render(
             request,
-            "presentations/presentation_list.html",
+            "presentation/presentation_list.html",
             {
                 "presentations": presentations,
             },

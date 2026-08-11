@@ -1,4 +1,4 @@
-from .settings import *
+from .settings.settings import *
 
 SECURE_SSL_REDIRECT = False
 

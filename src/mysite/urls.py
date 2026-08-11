@@ -1,42 +1,41 @@
-from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.contrib.sitemaps.views import sitemap
+from django.urls import include, path
 
-from presentations.views.card import (
-    ChildCardCreateView,
-    MainCardCreateView,
-)
-from presentations.views.presentation import (
-    PresentationCreateView,
-    PresentationDetailView,
-    PresentationListView,
-)
+from blog.sitemaps import PostSitemap
+from mysite.health import LivenessView, ReadinessView
+from mysite.media import PublicProfileMediaView
 
-app_name = "presentations"
-
+sitemaps = {
+    "posts": PostSitemap,
+}
 
 urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("health/live/", LivenessView.as_view(), name="health-live"),
+    path("presentations/", include("presentation.urls")),
+    path("health/ready/", ReadinessView.as_view(), name="health-ready"),
     path(
-        "",
-        PresentationListView.as_view(),
-        name="list",
+        "media/profiles/<path:path>",
+        PublicProfileMediaView.as_view(),
+        name="public-profile-media",
     ),
+    path("blog/", include("blog.urls", namespace="blog")),
     path(
-        "create/",
-        PresentationCreateView.as_view(),
-        name="create",
-    ),
-    path(
-        "<int:presentation_id>/",
-        PresentationDetailView.as_view(),
-        name="detail",
-    ),
-    path(
-        "<int:presentation_id>/cards/",
-        MainCardCreateView.as_view(),
-        name="main-card-create",
-    ),
-    path(
-        "cards/<int:parent_id>/children/",
-        ChildCardCreateView.as_view(),
-        name="child-card-create",
+        "sitemap.xml",
+        sitemap,
+        {"sitemaps": sitemaps},
+        name="django.contrib.sitemaps.views.sitemap",
     ),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT,
+    )
+
+
+handler404 = "mysite.views.page_not_found"

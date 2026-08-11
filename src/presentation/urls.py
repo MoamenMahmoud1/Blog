@@ -1,10 +1,10 @@
 from django.urls import path
 
-from presentations.views.card import (
+from presentation.views.card import (
     ChildCardCreateView,
     MainCardCreateView,
 )
-from presentations.views.presentation import (
+from presentation.views.presentation import (
     PresentationCreateView,
     PresentationDetailView,
     PresentationListView,

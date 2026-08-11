@@ -1,0 +1,68 @@
+{% extends "blog/base.html" %}
+{% load static %}
+
+{% block title %}
+  {{ presentation.title }}
+{% endblock %}
+
+{% block content %}
+  <link
+    rel="stylesheet"
+    href="{% static 'presentations/css/presentation.css' %}"
+  >
+
+  <main
+    class="presentation-stage"
+    id="presentation-stage"
+    data-presentation='{{ presentation_data|escapejs }}'
+  >
+    <section class="presentation-shell">
+      <div class="presentation-stack">
+        <article
+          class="presentation-card"
+          id="presentation-card"
+        >
+          <div
+            class="presentation-media"
+            id="presentation-media"
+          ></div>
+
+          <div class="presentation-content">
+            <span
+              class="presentation-type"
+              id="presentation-type"
+            ></span>
+
+            <h1 id="presentation-title"></h1>
+
+            <p id="presentation-content"></p>
+
+            <span
+              class="presentation-progress"
+              id="presentation-progress"
+            ></span>
+          </div>
+        </article>
+      </div>
+
+      <button
+        type="button"
+        class="presentation-nav presentation-nav-left"
+        id="presentation-previous"
+        aria-label="Previous card"
+      ></button>
+
+      <button
+        type="button"
+        class="presentation-nav presentation-nav-right"
+        id="presentation-next"
+        aria-label="Next card"
+      ></button>
+    </section>
+  </main>
+
+  <script
+    src="{% static 'presentations/js/presentation.js' %}"
+    defer
+  ></script>
+{% endblock %}

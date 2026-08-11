@@ -2,8 +2,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.views import View
 
-from presentations.models import Card, Presentation
-from presentations.services import (
+from presentation.models import Card, Presentation
+from presentation.services import (
     create_child_card,
     create_main_card,
 )
