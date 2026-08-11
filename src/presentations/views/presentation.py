@@ -2,6 +2,7 @@ import json
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
+from django.shortcuts import render
 from django.views import View
 
 from presentations.models import Presentation
@@ -13,7 +14,9 @@ from presentations.services import create_presentation
 class PresentationListView(View):
     def get(self, request):
         presentations = (
-            Presentation.objects.filter(status=Presentation.Status.PUBLISHED)
+            Presentation.objects.filter(
+                status=Presentation.Status.PUBLISHED,
+            )
             .values(
                 "id",
                 "title",
@@ -22,24 +25,38 @@ class PresentationListView(View):
             .order_by("-created")
         )
 
-        return JsonResponse(
+        return render(
+            request,
+            "presentations/presentation_list.html",
             {
-                "presentations": list(presentations),
-            }
+                "presentations": presentations,
+            },
         )
 
 
 class PresentationDetailView(View):
     def get(self, request, presentation_id):
         try:
-            presentation = get_presentation_with_cards(presentation_id=presentation_id)
+            presentation = get_presentation_with_cards(
+                presentation_id=presentation_id,
+            )
         except Presentation.DoesNotExist:
-            return JsonResponse(
-                {"detail": "Presentation not found."},
+            return render(
+                request,
+                "404.html",
                 status=404,
             )
 
-        return JsonResponse(serialize_presentation(presentation))
+        presentation_data = serialize_presentation(presentation)
+
+        return render(
+            request,
+            "presentations/presentation_detail.html",
+            {
+                "presentation": presentation,
+                "presentation_data": json.dumps(presentation_data),
+            },
+        )
 
 
 class PresentationCreateView(LoginRequiredMixin, View):
