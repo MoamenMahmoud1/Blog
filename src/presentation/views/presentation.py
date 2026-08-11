@@ -51,10 +51,11 @@ class PresentationDetailView(View):
 
         return render(
             request,
-            "presentations/presentation_detail.html",
+            "presentation/presentation_detail.html",
             {
                 "presentation": presentation,
                 "presentation_data": json.dumps(presentation_data),
+                "full_width": True,
             },
         )
 

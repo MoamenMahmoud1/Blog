@@ -2,67 +2,85 @@
 {% load static %}
 
 {% block title %}
-  {{ presentation.title }}
+    {{ presentation.title }}
 {% endblock %}
 
-{% block content %}
-  <link
-    rel="stylesheet"
-    href="{% static 'presentations/css/presentation.css' %}"
-  >
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'presentation/css/presentation.css' %}"
+    >
+{% endblock %}
 
-  <main
-    class="presentation-stage"
-    id="presentation-stage"
-    data-presentation='{{ presentation_data|escapejs }}'
-  >
-    <section class="presentation-shell">
-      <div class="presentation-stack">
-        <article
-          class="presentation-card"
-          id="presentation-card"
-        >
-          <div
-            class="presentation-media"
-            id="presentation-media"
-          ></div>
+{% block full_content %}
+    <main
+        id="presentationStage"
+        class="presentation-stage"
+        data-presentation="{{ presentation_data|escape }}"
+    >
+        <section class="presentation-viewport">
 
-          <div class="presentation-content">
-            <span
-              class="presentation-type"
-              id="presentation-type"
-            ></span>
+            <div
+                id="cardStack"
+                class="presentation-stack"
+            >
+                <article
+                    id="activeCard"
+                    class="presentation-card"
+                >
+                    <div
+                        id="cardMedia"
+                        class="presentation-card__media"
+                    ></div>
 
-            <h1 id="presentation-title"></h1>
+                    <div class="presentation-card__body">
 
-            <p id="presentation-content"></p>
+                        <span
+                            id="cardLabel"
+                            class="presentation-card__label"
+                        ></span>
 
-            <span
-              class="presentation-progress"
-              id="presentation-progress"
-            ></span>
-          </div>
-        </article>
-      </div>
+                        <h1 id="cardTitle"></h1>
 
-      <button
-        type="button"
-        class="presentation-nav presentation-nav-left"
-        id="presentation-previous"
-        aria-label="Previous card"
-      ></button>
+                        <p id="cardContent"></p>
 
-      <button
-        type="button"
-        class="presentation-nav presentation-nav-right"
-        id="presentation-next"
-        aria-label="Next card"
-      ></button>
-    </section>
-  </main>
+                    </div>
+                </article>
+            </div>
 
-  <script
-    src="{% static 'presentations/js/presentation.js' %}"
-    defer
-  ></script>
+            <div
+                id="cardProgress"
+                class="presentation-progress"
+                aria-live="polite"
+            ></div>
+
+            <button
+                id="previousCard"
+                class="
+                    presentation-hit-area
+                    presentation-hit-area--left
+                "
+                type="button"
+                aria-label="Previous card"
+            ></button>
+
+            <button
+                id="nextCard"
+                class="
+                    presentation-hit-area
+                    presentation-hit-area--right
+                "
+                type="button"
+                aria-label="Next card"
+            ></button>
+
+        </section>
+    </main>
+{% endblock %}
+
+{% block extra_js %}
+    <script
+        src="{% static 'presentation/js/presentation.js' %}"
+        defer
+    ></script>
 {% endblock %}
