@@ -46,6 +46,10 @@ def create_main_card(
     image=None,
     video=None,
 ) -> Card:
+    # Lock the presentation so two main cards cannot
+    # calculate the same order at the same time.
+    presentation = Presentation.objects.select_for_update().get(pk=presentation.pk)
+
     card = Card(
         presentation=presentation,
         parent=None,
@@ -71,6 +75,14 @@ def create_child_card(
     image=None,
     video=None,
 ) -> Card:
+    # Lock the parent so two children cannot calculate
+    # the same order at the same time.
+    parent = (
+        Card.objects.select_for_update()
+        .select_related("presentation")
+        .get(pk=parent.pk)
+    )
+
     if not parent.is_main:
         raise ValidationError("Child cards can only belong to a main card.")
 
