@@ -1,11 +1,11 @@
-Django==6.0.7
+Django==6.1
 Pillow==12.3.0
 python-decouple==3.8
 dj-database-url==3.1.2
 django-extensions==4.1
 psycopg[binary]==3.3.4
 django-taggit==6.1.0
-Markdown==3.10.2
+Markdown==3.10.3
 nh3==0.3.6
 easy-thumbnails==2.10.1
 celery[redis]==5.6.3

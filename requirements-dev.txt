@@ -1,5 +1,5 @@
 -r requirements.txt
 
-djlint==1.43.2
-pre-commit==4.6.1
-ruff==0.16.1
+djlint==1.44.2
+pre-commit==4.6.2
+ruff==0.16.3
