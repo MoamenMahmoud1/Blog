@@ -65,7 +65,6 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     "taggit",
     "blog.apps.BlogConfig",
-    "presentation.apps.PresentationConfig",
     "easy_thumbnails",
 ]
 

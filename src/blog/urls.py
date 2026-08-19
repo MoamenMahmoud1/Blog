@@ -14,7 +14,7 @@ urlpatterns = [
     ),
     path("<int:pk>/edit/", accounts.ProfileUpdateView.as_view(), name="edit-profile"),
     path(
-        "<int:year>/<int:month>/<int:day>/<slug:post>/",
+        "<int:year>/<int:month>/<int:day>/<str:post>/",
         public.PostDetailView.as_view(),
         name="post_detail",
     ),

@@ -96,6 +96,18 @@ class PublicContentTests(BlogTestBase):
             self.client.get(self.future.get_absolute_url()).status_code, 404
         )
 
+    def test_detail_url_accepts_unicode_slug(self):
+        post = Post.objects.create(
+            title="السلام عليكم",
+            body="Arabic post",
+            author=self.author,
+            status=Post.Status.PUBLISHED,
+            publish=timezone.now(),
+        )
+
+        self.assertEqual(post.slug, "السلام-عليكم")
+        self.assertEqual(self.client.get(post.get_absolute_url()).status_code, 200)
+
     def test_post_feed_loads_database_batches_without_full_page_html(self):
         for number in range(7):
             Post.objects.create(

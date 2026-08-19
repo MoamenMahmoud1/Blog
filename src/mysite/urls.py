@@ -15,7 +15,6 @@ sitemaps = {
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("health/live/", LivenessView.as_view(), name="health-live"),
-    path("presentations/", include("presentation.urls")),
     path("health/ready/", ReadinessView.as_view(), name="health-ready"),
     path(
         "media/profiles/<path:path>",

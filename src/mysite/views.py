@@ -1,5 +1,5 @@
-from django.shortcuts import redirect
+from django.shortcuts import render
 
 
 def page_not_found(request, exception):
-    return redirect("blog:dashboard")
+    return render(request, "404.html", status=404)

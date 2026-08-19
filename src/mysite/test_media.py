@@ -1,11 +1,11 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.urls import reverse
 
 
-class PublicProfileMediaTests(TestCase):
+class PublicProfileMediaTests(SimpleTestCase):
     def setUp(self):
         self.temporary_directory = TemporaryDirectory()
         self.addCleanup(self.temporary_directory.cleanup)
